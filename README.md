@@ -1,44 +1,42 @@
-#  Desafío Técnico TI | Arquitectura Distribuida para Procesamiento de Matrices
+# Desafío Técnico TI - Interseguro 
 
-Este repositorio contiene mi solución integral al Coding Challenge para la posición de TI. 
+Solución integral basada en arquitectura de microservicios para el procesamiento, rotación y cálculo estadístico de matrices. 
 
-En lugar de construir scripts aislados, decidí diseñar e implementar una **arquitectura moderna de microservicios contenerizados**. La solución no solo cumple con los requisitos matemáticos obligatorios, sino que incorpora un frontend completo y buenas prácticas de infraestructura y despliegue.
+##  Enlaces de Producción (Despliegue en Render)
 
----
+El proyecto está subido a la nube y es completamente funcional. Puedes probar la interfaz interactiva o consumir las APIs directamente:
 
-##  Topología del Sistema
+*   **Frontend (UI Interactiva):** [https://frontend-interseguro.onrender.com]
+*   **API Go (Core & QR):** [https://go-api-interseguro-rhs2.onrender.com]
+*   **API Node.js (Estadísticas):** [https://node-api-interseguro-l8ya.onrender.com]
 
-El proyecto está compuesto por tres servicios independientes que operan dentro de una red privada de Docker:
 
-1. **Go API (Gateway & Math Engine):** * Construida con **Fiber** por su baja latencia y alto rendimiento.
-   * **Responsabilidad:** Actúa como punto de entrada (recibe el POST del usuario), calcula la factorización QR de la matriz ingresada y delega el análisis estadístico al siguiente microservicio.
-2. **Node.js API (Data Processor):** * Construida con **Express.js**.
-   * **Responsabilidad:** Recibe de Go los resultados de la rotación/factorización y procesa la lógica de negocio secundaria (Máximo, Mínimo, Promedio, Suma Total y validación de matriz diagonal).
-3. **Frontend SPA (Bonus Implementado):** * Construido con **Vue 3** y servido estáticamente a través de **Nginx**.
-   * **Responsabilidad:** Proporcionar una experiencia de usuario limpia y evitar el uso obligatorio de herramientas como Postman para evaluar la prueba. Incluye validación de sintaxis JSON en el cliente.
+## 🏗️ Arquitectura del Sistema
 
----
+La solución está dividida en tres contenedores independientes que se comunican entre sí:
 
-## 🛠️ Stack Tecnológico
+1.  **API Orquestadora (Go / Fiber):**
+    *   Recibe una matriz rectangular (n x m).
+    *   Realiza una rotación de **90 grados en sentido horario**.
+    *   Calcula la **factorización QR** utilizando la librería matemática `gonum`.
+    *   Delega el cálculo estadístico enviando las matrices resultantes al microservicio de Node.js.
+2.  **API Estadística (Node.js / Express):**
+    *   Procesa las matrices recibidas desde Go.
+    *   Calcula y retorna: **Máximo, Mínimo, Promedio, Suma Total** y valida si alguna es una **Matriz Diagonal**.
+3.  **Frontend Cliente (Vue.js 3 / Vite) - *Plus Opcional*:**
+    *   Interfaz web amigable para ingresar el JSON de la matriz y visualizar tanto la rotación como los datos estadísticos en tiempo real.
 
-* **Lenguajes:** Go (1.26), Node.js (v20), JavaScript/HTML/CSS
-* **Frameworks:** Fiber, Express, Vue 3 (Composition API), Vite
-* **Infraestructura:** Docker, Docker Compose, Nginx (Docker Hub: `aylas`)
-* **Comunicaciones:** RESTful HTTP, JSON
 
----
+##  Ejecución Local con Docker
 
-##  Guía de Despliegue Local
-
-Gracias a Docker, no es necesario instalar ni configurar entornos de desarrollo complejos. Si tienes Docker corriendo en tu máquina, estás a un comando de levantar toda la infraestructura.
+El proyecto está completamente contenedorizado para garantizar que funcione en cualquier entorno sin necesidad de instalar Go o Node.js de forma nativa.
 
 ### Requisitos previos
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado.
-* Puertos `80`, `8080` y `3000` libres en tu entorno local.
+*   [Docker](https://www.docker.com/) y Docker Compose instalados.
 
-### Pasos de ejecución
+### Pasos para levantar el proyecto
 
-1. Clona este repositorio y entra a la carpeta del proyecto:
-   ```bash
-   git clone [https://github.com/Tomas-coder-dev/Prueba-Tecnica-Interseguro.git](https://github.com/Tomas-coder-dev/Prueba-Tecnica-Interseguro.git)
+1. Clona este repositorio:
+
+   git clone [https://github.com/Tomas-coder-dev/Prueba-Tecnica-Interseguro.git]
    cd Prueba-Tecnica-Interseguro
