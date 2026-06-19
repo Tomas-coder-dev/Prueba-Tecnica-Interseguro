@@ -2,12 +2,13 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
+// data de prueba por defecto
 const inputMatrix = ref('[\n  [1, 2, 3],\n  [4, 5, 6],\n  [7, 8, 9]\n]');
 const results = ref(null);
 const errorMsg = ref('');
 const isLoading = ref(false);
 
-// Formateamos los floats largos  a máximo 4 decimales para no romper la UI
+// cortamos los decimales largos para no romper el diseño de las tarjetas
 const formatNumber = (num) => {
   if (typeof num !== 'number') return num;
   return Number.isInteger(num) ? num : Number(num.toFixed(4));
@@ -21,18 +22,19 @@ const processMatrix = async () => {
   try {
     const parsedMatrix = JSON.parse(inputMatrix.value);
 
-    // Usamos la variable de entorno para la URL del backend
+    // le pegamos al backend de go pasándole la matriz
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/qr`, {
       matrix: parsedMatrix
     });
 
+    // guardamos todo el payload (ahora trae rotatedMatrix y statistics)
     results.value = response.data;
 
   } catch (err) {
     if (err instanceof SyntaxError) {
-      errorMsg.value = 'Revisa la sintaxis del JSON. Faltan comas o corchetes.';
+      errorMsg.value = 'Revisa el formato del JSON. Faltan comas o corchetes por ahí.';
     } else {
-      errorMsg.value = err.response?.data?.error || 'Falló la conexión con el backend de Go.';
+      errorMsg.value = err.response?.data?.error || 'Se cayó la conexión con el backend de Go.';
     }
   } finally {
     isLoading.value = false;
@@ -60,28 +62,33 @@ const processMatrix = async () => {
       </div>
     </section>
 
-    <section v-if="results" class="panel results-panel">
-      <h2>Resultados</h2>
+    <section v-if="results && results.rotatedMatrix" class="panel">
+      <h2>Matriz Rotada (90° Horario)</h2>
+      <pre class="matrix-preview">{{ JSON.stringify(results.rotatedMatrix, null, 2) }}</pre>
+    </section>
+
+    <section v-if="results && results.statistics" class="panel results-panel">
+      <h2>Resultados Estadísticos</h2>
       <div class="grid">
         <div class="card">
           <span class="label">Máximo</span>
-          <span class="value">{{ formatNumber(results.max) }}</span>
+          <span class="value">{{ formatNumber(results.statistics.max) }}</span>
         </div>
         <div class="card">
           <span class="label">Mínimo</span>
-          <span class="value">{{ formatNumber(results.min) }}</span>
+          <span class="value">{{ formatNumber(results.statistics.min) }}</span>
         </div>
         <div class="card">
           <span class="label">Promedio</span>
-          <span class="value">{{ formatNumber(results.average) }}</span>
+          <span class="value">{{ formatNumber(results.statistics.average) }}</span>
         </div>
         <div class="card">
           <span class="label">Suma</span>
-          <span class="value">{{ formatNumber(results.sum) }}</span>
+          <span class="value">{{ formatNumber(results.statistics.sum) }}</span>
         </div>
         <div class="card">
           <span class="label">¿Es Diagonal?</span>
-          <span class="value">{{ results.hasDiagonalMatrix ? 'Sí' : 'No' }}</span>
+          <span class="value">{{ results.statistics.hasDiagonalMatrix ? 'Sí' : 'No' }}</span>
         </div>
       </div>
     </section>
@@ -159,9 +166,18 @@ button:disabled {
   border-radius: 4px;
 }
 
+.matrix-preview {
+  background: #f1f5f9;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: monospace;
+  color: #334155;
+  margin-top: 1rem;
+}
+
 .grid {
   display: grid;
-  /* El minmax a 100px ayuda a que las tarjetas no colapsen en pantallas pequeñas */
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
@@ -175,7 +191,6 @@ button:disabled {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  /* Evitamos que el texto haga overflow si los números aún fueran grandes */
   word-break: break-word;
   text-align: center;
 }
