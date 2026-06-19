@@ -28,7 +28,7 @@ El proyecto incluye suites de pruebas automatizadas para garantizar la precisió
 
 ##  Ejecución Local con Docker
 
-El proyecto está totalmente contenedorizado.
+El proyecto está totalmente dockerizado
 
 ### Pasos para levantar el proyecto
 
