@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"qr-api/models"
 	"qr-api/services"
 	"qr-api/utils"
@@ -8,30 +9,29 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-// QRHandler recibe la matriz, valida su formato, la rota, calcula el QR
-// y reenvía el resultado a Node.js para obtener las estadísticas.
+// QRHandler maneja el request de la matriz, valida, rota y saca el QR
 func QRHandler(c fiber.Ctx) error {
 
 	var req models.MatrixRequest
 
-	// Parseamos el body
+	// mapeamos el body a la estructura
 	if err := c.Bind().Body(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": "invalid request",
+			"error": "request invalido",
 		})
 	}
 
-	// Validamos que sea una matriz válida
+	// check para que no manden matrices vacias o deformes
 	if err := utils.ValidateMatrix(req.Matrix); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	// 1. ROTAMOS LA MATRIZ
+	// paso 1: rotamos a la derecha (90 grados)
 	rotatedMatrix := utils.RotateMatrix(req.Matrix)
 
-	// 2. Calculamos Q y R usando la matriz ROTADA
+	// paso 2: sacamos las matrices Q y R usando la que ya esta rotada
 	result, err := services.CalculateQR(rotatedMatrix)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -39,7 +39,7 @@ func QRHandler(c fiber.Ctx) error {
 		})
 	}
 
-	// Pasamos el resultado al servicio de Node
+	// le pasamos el paquete a node para que calcule max, min, etc
 	nodeResponse, err := services.SendToNode(result)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -47,5 +47,13 @@ func QRHandler(c fiber.Ctx) error {
 		})
 	}
 
-	return c.Send(nodeResponse)
+	// desempaquetamos el json que nos devuelve node
+	var stats map[string]interface{}
+	json.Unmarshal(nodeResponse, &stats)
+
+	// por ultimo devolvemos todo junto al front
+	return c.JSON(fiber.Map{
+		"rotatedMatrix": rotatedMatrix,
+		"statistics":    stats,
+	})
 }
