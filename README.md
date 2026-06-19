@@ -1,30 +1,44 @@
-#  Desafío Técnico  - Procesador de Matrices
+#  Desafío Técnico TI | Arquitectura Distribuida para Procesamiento de Matrices
 
-Este proyecto es la solución a la prueba técnica para el procesamiento de matrices. En lugar de hacer un script simple, opté por diseñar una arquitectura moderna y escalable basada en microservicios, utilizando contenedores para garantizar que el código se ejecute de manera idéntica en cualquier entorno.
+Este repositorio contiene mi solución integral al Coding Challenge para la posición de TI. 
 
-##  La Arquitectura
-
-El sistema está compuesto por tres piezas clave que se comunican de forma aislada a través de una red interna:
-
-1. **El Motor Matemático (Go):** Construido sobre **Fiber** por su altísimo rendimiento. Este servicio actúa como la puerta de entrada, recibe la matriz original, calcula su factorización QR y delega el resto del trabajo.
-2. **El Procesador Estadístico (Node.js):** Construido con **Express**. Se encarga de recibir los resultados matemáticos de Go y procesar la lógica de negocio (cálculo de máximos, mínimos, promedios, sumas y la validación de matriz diagonal).
-3. **El Panel de Control (Vue.js + Nginx):** *[Implementación Opcional]* Para no depender de Postman o cURL al evaluar la prueba, construí una interfaz minimalista. Se compila estáticamente y es servida por **Nginx**, lo que la hace extremadamente rápida.
-
-## 🛠️ Tecnologías Elegidas
-
-* **Backend:** Go (Golang) 1.26, Node.js 20
-* **Frontend:** Vue 3 (Composition API), Vite, CSS puro (sin dependencias pesadas).
-* **Infraestructura:** Docker, Docker Compose.
+En lugar de construir scripts aislados, decidí diseñar e implementar una **arquitectura moderna de microservicios contenerizados**. La solución no solo cumple con los requisitos matemáticos obligatorios, sino que incorpora un frontend completo y buenas prácticas de infraestructura y despliegue.
 
 ---
 
-## 🚦 Cómo probar el proyecto localmente
+##  Topología del Sistema
 
-Gracias a Docker, no necesitas instalar Go, Node, ni configurar variables de entorno en tu máquina. Si tienes Docker instalado, estás a un comando de distancia.
+El proyecto está compuesto por tres servicios independientes que operan dentro de una red privada de Docker:
 
-### Pasos:
+1. **Go API (Gateway & Math Engine):** * Construida con **Fiber** por su baja latencia y alto rendimiento.
+   * **Responsabilidad:** Actúa como punto de entrada (recibe el POST del usuario), calcula la factorización QR de la matriz ingresada y delega el análisis estadístico al siguiente microservicio.
+2. **Node.js API (Data Processor):** * Construida con **Express.js**.
+   * **Responsabilidad:** Recibe de Go los resultados de la rotación/factorización y procesa la lógica de negocio secundaria (Máximo, Mínimo, Promedio, Suma Total y validación de matriz diagonal).
+3. **Frontend SPA (Bonus Implementado):** * Construido con **Vue 3** y servido estáticamente a través de **Nginx**.
+   * **Responsabilidad:** Proporcionar una experiencia de usuario limpia y evitar el uso obligatorio de herramientas como Postman para evaluar la prueba. Incluye validación de sintaxis JSON en el cliente.
 
-1. Clona este repositorio en tu máquina:
+---
+
+## 🛠️ Stack Tecnológico
+
+* **Lenguajes:** Go (1.26), Node.js (v20), JavaScript/HTML/CSS
+* **Frameworks:** Fiber, Express, Vue 3 (Composition API), Vite
+* **Infraestructura:** Docker, Docker Compose, Nginx (Docker Hub: `aylas`)
+* **Comunicaciones:** RESTful HTTP, JSON
+
+---
+
+##  Guía de Despliegue Local
+
+Gracias a Docker, no es necesario instalar ni configurar entornos de desarrollo complejos. Si tienes Docker corriendo en tu máquina, estás a un comando de levantar toda la infraestructura.
+
+### Requisitos previos
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado.
+* Puertos `80`, `8080` y `3000` libres en tu entorno local.
+
+### Pasos de ejecución
+
+1. Clona este repositorio y entra a la carpeta del proyecto:
    ```bash
-   git clone [https://github.com/TU_USUARIO/technical-challenge-ti.git](https://github.com/TU_USUARIO/technical-challenge-ti.git)
-   cd technical-challenge-ti
+   git clone [https://github.com/Tomas-coder-dev/Prueba-Tecnica-Interseguro.git](https://github.com/Tomas-coder-dev/Prueba-Tecnica-Interseguro.git)
+   cd Prueba-Tecnica-Interseguro
