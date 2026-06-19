@@ -7,15 +7,17 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/cors"
 )
 
-// Inicializa Fiber, registra las rutas y levanta el servidor.
 func main() {
 
 	app := fiber.New()
 
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"https://frontend-interseguro.onrender.com"},
+		AllowMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+	}))
 
 	app.Post("/qr", handlers.QRHandler)
 
-	// Levantamos el servidor en el puerto 8080
 	app.Listen(":8080")
 }
