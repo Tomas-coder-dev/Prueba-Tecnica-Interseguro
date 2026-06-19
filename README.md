@@ -10,29 +10,25 @@ El proyecto está subido a la nube y es completamente funcional. Puedes probar l
 *   **API Go (Core & QR):** [https://go-api-interseguro-rhs2.onrender.com]
 *   **API Node.js (Estadísticas):** [https://node-api-interseguro-l8ya.onrender.com]
 
+##  Arquitectura del Sistema
 
-## 🏗️ Arquitectura del Sistema
+La solución está dividida en contenedores independientes que se comunican mediante HTTP:
 
-La solución está dividida en tres contenedores independientes que se comunican entre sí:
+1.  **API Orquestadora (Go / Fiber):** Recibe la matriz, realiza la rotación de 90° horario y calcula la factorización QR. Delega el cálculo estadístico al microservicio de Node.js.
+2.  **API Estadística (Node.js / Express):** Procesa las matrices recibidas y calcula: Máximo, Mínimo, Promedio, Suma Total y validación de matriz diagonal.
+3.  **Frontend Cliente (Vue.js 3 / Vite):** Interfaz para gestión de matrices y visualización de resultados en tiempo real.
 
-1.  **API Orquestadora (Go / Fiber):**
-    *   Recibe una matriz rectangular (n x m).
-    *   Realiza una rotación de **90 grados en sentido horario**.
-    *   Calcula la **factorización QR** utilizando la librería matemática `gonum`.
-    *   Delega el cálculo estadístico enviando las matrices resultantes al microservicio de Node.js.
-2.  **API Estadística (Node.js / Express):**
-    *   Procesa las matrices recibidas desde Go.
-    *   Calcula y retorna: **Máximo, Mínimo, Promedio, Suma Total** y valida si alguna es una **Matriz Diagonal**.
-3.  **Frontend Cliente (Vue.js 3 / Vite) - *Plus Opcional*:**
-    *   Interfaz web amigable para ingresar el JSON de la matriz y visualizar tanto la rotación como los datos estadísticos en tiempo real.
+##  Pruebas Unitarias
+
+El proyecto incluye suites de pruebas automatizadas para garantizar la precisión matemática y la integridad de los datos:
+
+*   **Go (Lógica de Rotación y Validación):** Ejecuta `go test ./utils -v` en la carpeta `go-api`.
+*   **Node.js (Lógica Estadística):** Ejecuta `npm test` en la carpeta `node-api` (utilizando **Jest**).
 
 
 ##  Ejecución Local con Docker
 
-El proyecto está completamente contenedorizado para garantizar que funcione en cualquier entorno sin necesidad de instalar Go o Node.js de forma nativa.
-
-### Requisitos previos
-*   [Docker](https://www.docker.com/) y Docker Compose instalados.
+El proyecto está totalmente contenedorizado.
 
 ### Pasos para levantar el proyecto
 
@@ -40,3 +36,4 @@ El proyecto está completamente contenedorizado para garantizar que funcione en 
 
    git clone [https://github.com/Tomas-coder-dev/Prueba-Tecnica-Interseguro.git]
    cd Prueba-Tecnica-Interseguro
+
