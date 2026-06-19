@@ -7,7 +7,7 @@ const results = ref(null);
 const errorMsg = ref('');
 const isLoading = ref(false);
 
-// Formateamos los floats largos (ej: 1.809068...) a máximo 4 decimales para no romper la UI
+// Formateamos los floats largos  a máximo 4 decimales para no romper la UI
 const formatNumber = (num) => {
   if (typeof num !== 'number') return num;
   return Number.isInteger(num) ? num : Number(num.toFixed(4));
@@ -21,8 +21,8 @@ const processMatrix = async () => {
   try {
     const parsedMatrix = JSON.parse(inputMatrix.value);
 
-    // Pegamos a la IP directa para saltarnos los líos de resolución IPv6 de localhost
-    const response = await axios.post('http://127.0.0.1:8080/qr', {
+    // Usamos la variable de entorno para la URL del backend
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/qr`, {
       matrix: parsedMatrix
     });
 
