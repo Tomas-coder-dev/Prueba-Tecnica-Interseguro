@@ -8,6 +8,9 @@ app.use(express.json());
 
 app.use("/statistics", statisticsRoutes);
 
-app.listen(3000, () => {
-  console.log("Node API running on port 3000");
+// Usamos el puerto que Render nos da, o el 3000 si estamos en local
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Node API running on port ${PORT}`);
 });
