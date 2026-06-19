@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-// QRHandler recibe la matriz, valida su formato, calcula el QR
+// QRHandler recibe la matriz, valida su formato, la rota, calcula el QR
 // y reenvía el resultado a Node.js para obtener las estadísticas.
 func QRHandler(c fiber.Ctx) error {
 
@@ -21,15 +21,18 @@ func QRHandler(c fiber.Ctx) error {
 		})
 	}
 
-	// Validamos que sea una matriz válida (rectangular, no vacía)
+	// Validamos que sea una matriz válida
 	if err := utils.ValidateMatrix(req.Matrix); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	// Calculamos Q y R
-	result, err := services.CalculateQR(req.Matrix)
+	// 1. ROTAMOS LA MATRIZ
+	rotatedMatrix := utils.RotateMatrix(req.Matrix)
+
+	// 2. Calculamos Q y R usando la matriz ROTADA
+	result, err := services.CalculateQR(rotatedMatrix)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
